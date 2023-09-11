@@ -23,16 +23,22 @@ pipeline{
         }
 
         stage ('Deploy Kubernetes') {
-            environment {
-                tag_version = "${env.BUILD_ID}"
-            }
-            steps {
-                withKubeConfig([credentialsId: 'kubeconfig']) {
-                    sh 'sed -i "s/{{tag}}/$tag_version/g" ./k8s/deployment.yaml'
-                    sh 'kubectl apply -f ./k8s/deployment.yaml'
-                }
+    environment {
+        tag_version = "${env.BUILD_ID}"
+    }
+    steps {
+        script {
+            if (isUnix()) {
+                // Execute comandos Kubernetes no ambiente Unix-like (Linux, macOS)
+                sh 'sed -i "s/{{tag}}/$tag_version/g" ./k8s/deployment.yaml'
+                sh 'kubectl apply -f ./k8s/deployment.yaml'
+            } else {
+                // Execute comandos Kubernetes no ambiente Windows (PowerShell)
+                powershell "(Get-Content ./k8s/deployment.yaml) | ForEach-Object { $_ -replace '{{tag}}', '$tag_version' } | Set-Content ./k8s/deployment.yaml"
+                powershell "kubectl apply -f .\\k8s\\deployment.yaml"
             }
         }
+    }
     }
 
 }
