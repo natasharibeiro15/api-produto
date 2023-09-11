@@ -30,8 +30,12 @@ pipeline {
     steps {
         script {
             def tag = env.tag_version
-            bat "Get-Content ./k8s/deployment.yaml | ForEach-Object { \$_ -replace '{{tag}}', '${tag}' } | Set-Content -Path ./k8s/deployment.yaml -Force"
-            bat 'kubectl apply -f ./k8s/deployment.yaml'
+            bat """
+                Get-Content ./k8s/deployment.yaml | ForEach-Object { \$_ -replace '{{tag}}', '${tag}' } | Set-Content -Path ./k8s/deployment.yaml -Force
+                type ./k8s/deployment.yaml | findstr /V "{{tag}}" > ./k8s/deployment_temp.yaml
+                move /Y ./k8s/deployment_temp.yaml ./k8s/deployment.yaml
+                kubectl apply -f ./k8s/deployment.yaml
+            """
         }
     }
 }
