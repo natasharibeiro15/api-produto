@@ -1,7 +1,7 @@
 ---
 swagger: "2.0"
 info:
-  description: "API de Cadastro de Produtos - Versão 1.0"
+  description: "API de Cadastro de Produtos - Versão 3.0"
   version: "3.0.0"
   title: "Cadastro de Produtos - Versão 1.0"
   contact:
