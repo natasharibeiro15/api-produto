@@ -1,17 +1,16 @@
-pipeline{
-
+pipeline {
     agent any
 
-    stages{
-        stage('Build Image'){
-            steps{
-                 script {
-                    dockerapp = docker.build("natasharibeiro15/api-produto:${env.BUILD_ID}", '-f ./src/Dockerfile ./src') 
-                } 
+    stages {
+        stage('Build Image') {
+            steps {
+                script {
+                    dockerapp = docker.build("natasharibeiro15/api-produto:${env.BUILD_ID}", '-f ./src/Dockerfile ./src')
+                }
             }
         }
 
-        stage ('Push Image') {
+        stage('Push Image') {
             steps {
                 script {
                     docker.withRegistry('https://registry.hub.docker.com', 'dockerhub') {
@@ -22,14 +21,16 @@ pipeline{
             }
         }
 
- stage ('Deploy Kubernetes') {
+        stage('Deploy Kubernetes') {
             environment {
                 tag_version = "${env.BUILD_ID}"
             }
             steps {
-                withKubeConfig([credentialsId: 'kubeconfig']) {
+                script {
+                   ithKubeConfig([credentialsId: 'kubeconfig']) {
                     sh 'sed -i "s/{{tag}}/$tag_version/g" ./k8s/deployment.yaml'
                     sh 'kubectl apply -f ./k8s/deployment.yaml'
+                }
                 }
             }
         }
