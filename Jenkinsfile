@@ -11,17 +11,6 @@ pipeline {
             }
         }
 
-        stage('Push Image') {
-            steps {
-                script {
-                    // Fazer o push da imagem para o Docker Hub
-                    docker.withRegistry('https://registry.hub.docker.com', 'dockerhub') {
-                        dockerapp.push('latest')
-                        dockerapp.push("${env.BUILD_ID}")
-                    }
-                }
-            }
-        }
-
     }
 }
+
