@@ -16,7 +16,7 @@ pipeline {
                 script {
                     // registra a imagem Docker
                     docker.withRegistry('https://registry.hub.docker.com', 'dockerhub') {
-                        dockerapp.push('latest)
+                        dockerapp.push('latest')
                         dockerapp.push("${env.BUILD_ID}")
                     }
                 }
