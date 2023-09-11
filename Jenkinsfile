@@ -24,18 +24,17 @@ pipeline {
         }
 
         stage('Deploy Kubernetes') {
-            environment {
-                tag_version = "${env.BUILD_ID}"
-            }
-            steps {
-                script {
-                    // Substituir a tag no arquivo de configuração do Kubernetes
-                    bat "powershell -Command (Get-Content ./k8s/deployment.yaml -Raw) -replace '{{tag}}', '$env:tag_version' | Set-Content ./k8s/deployment.yaml"
-                    
-                    // Aplicar as configurações no cluster Kubernetes (assumindo que o kubectl está configurado no PATH)
-                    bat "kubectl apply -f ./k8s/deployment.yaml"
-                }
-            }
+    environment {
+        tag_version = "${env.BUILD_ID}"
+    }
+    steps {
+        script {
+            def tag = env.tag_version
+            bat "type ./k8s/deployment.yaml | ForEach-Object { \$_ -replace '{{tag}}', '${tag}' } | Set-Content -Path ./k8s/deployment.yaml -Force"
+            bat 'kubectl apply -f ./k8s/deployment.yaml'
         }
+    }
+}
+
     }
 }
